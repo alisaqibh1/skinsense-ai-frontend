@@ -207,6 +207,52 @@ function ResultCard({ result }) {
               </p>
             </div>
 
+            {/* Top 5 Predictions */}
+            {result.top_predictions && result.top_predictions.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="bg-white rounded-xl p-6 shadow-md border-l-4"
+                style={{ borderColor: '#0891B2' }}
+              >
+                <h6 className="font-bold text-lg mb-4" style={{ color: '#0891B2' }}>
+                  Top 5 Predictions
+                </h6>
+                <div className="space-y-3">
+                  {result.top_predictions.map((pred, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <span 
+                        className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                        style={{ backgroundColor: index === 0 ? '#DC2626' : '#0891B2' }}
+                      >
+                        {index + 1}
+                      </span>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-medium" style={{ color: '#111827' }}>
+                            {pred.disease}
+                          </span>
+                          <span className="font-bold" style={{ color: index === 0 ? '#DC2626' : '#0891B2' }}>
+                            {pred.confidence}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pred.confidence}%` }}
+                            transition={{ duration: 0.8, delay: 0.1 * index }}
+                            className="h-full rounded-full"
+                            style={{ backgroundColor: index === 0 ? '#DC2626' : '#0891B2' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* AI-Powered Medical Advice */}
             {result.advice && (
               <motion.div
