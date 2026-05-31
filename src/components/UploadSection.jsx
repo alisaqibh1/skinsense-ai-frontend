@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Upload, Loader2, AlertCircle, Camera, X } from 'lucide-react'
+import { Upload, Loader2, AlertCircle, Camera, X, SwitchCamera } from 'lucide-react'
 import axios from 'axios'
 
 function UploadSection({ setResult, loading, setLoading }) {
@@ -9,6 +9,7 @@ function UploadSection({ setResult, loading, setLoading }) {
   const [dragActive, setDragActive] = useState(false)
   const [showCamera, setShowCamera] = useState(false)
   const [stream, setStream] = useState(null)
+  const [facingMode, setFacingMode] = useState('environment') // 'environment' = back, 'user' = front
   const fileInputRef = useRef(null)
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
@@ -54,21 +55,28 @@ function UploadSection({ setResult, loading, setLoading }) {
     reader.readAsDataURL(file)
   }
 
-  const startCamera = async () => {
+  const startCamera = async (mode = facingMode) => {
     try {
       setError(null)
+      
+      // Stop existing stream if any
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop())
+      }
+      
       const cameraWidth = parseInt(import.meta.env.VITE_CAMERA_WIDTH || '1280')
       const cameraHeight = parseInt(import.meta.env.VITE_CAMERA_HEIGHT || '720')
       
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
-          facingMode: 'environment',
+          facingMode: mode,
           width: { ideal: cameraWidth },
           height: { ideal: cameraHeight }
         } 
       })
       setStream(mediaStream)
       setShowCamera(true)
+      setFacingMode(mode)
       
       // Wait for video element to be ready
       setTimeout(() => {
@@ -80,6 +88,11 @@ function UploadSection({ setResult, loading, setLoading }) {
       console.error('Camera error:', err)
       setError('Unable to access camera. Please check permissions or use file upload instead.')
     }
+  }
+
+  const switchCamera = () => {
+    const newMode = facingMode === 'environment' ? 'user' : 'environment'
+    startCamera(newMode)
   }
 
   const stopCamera = () => {
@@ -205,7 +218,15 @@ function UploadSection({ setResult, loading, setLoading }) {
                 style={{ maxHeight: '500px' }}
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
-                <div className="flex gap-4 justify-center">
+                <div className="flex gap-4 justify-center flex-wrap">
+                  <button
+                    onClick={switchCamera}
+                    className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-lg transition font-medium flex items-center gap-2 hover:bg-white/30"
+                    title={facingMode === 'environment' ? 'Switch to Front Camera' : 'Switch to Back Camera'}
+                  >
+                    <SwitchCamera size={20} />
+                    Switch Camera
+                  </button>
                   <button
                     onClick={capturePhoto}
                     className="px-8 py-3 text-white rounded-lg transition font-medium flex items-center gap-2"
@@ -218,7 +239,7 @@ function UploadSection({ setResult, loading, setLoading }) {
                   </button>
                   <button
                     onClick={stopCamera}
-                    className="px-8 py-3 bg-gray-600 text-white rounded-lg transition font-medium flex items-center gap-2 hover:bg-gray-700"
+                    className="px-6 py-3 bg-gray-600 text-white rounded-lg transition font-medium flex items-center gap-2 hover:bg-gray-700"
                   >
                     <X size={20} />
                     Cancel
