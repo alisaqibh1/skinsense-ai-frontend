@@ -15,7 +15,7 @@ This repo is the **frontend**. It talks to a separate FastAPI backend deployed o
 
 ## 🏗️ System Architecture
 
-![SkinSense AI architecture](./assets/architecture.svg)
+![SkinSense AI architecture](./src/assets/architecture.svg)
 
 **Flow:** user uploads/captures a skin image → frontend sends it to the backend → DINOv2 classifies the condition → the prediction is passed to Groq's Llama 3 to generate a plain-language medical explainer → result + PDF report returned to the frontend.
 
