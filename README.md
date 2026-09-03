@@ -15,19 +15,7 @@ This repo is the **frontend**. It talks to a separate FastAPI backend deployed o
 
 ## 🏗️ System Architecture
 
-```
-┌─────────────────┐      HTTPS       ┌──────────────────────┐      loads at build     ┌────────────────────────┐
-│  React Frontend  │ ───────────────▶ │  FastAPI Backend      │ ───────────────────────▶ │  DINOv2 Model            │
-│  (Vercel)         │ ◀─────────────── │  (Docker, HF Spaces)  │      (Git LFS, bundled)  │  (private HF model repo) │
-└─────────────────┘      JSON        └──────────┬────────────┘                          └────────────────────────┘
-                                                  │
-                                                  ▼
-                                          ┌────────────────┐
-                                          │  Groq API        │
-                                          │  (Llama 3)        │
-                                          │  medical advice   │
-                                          └────────────────┘
-```
+![SkinSense AI architecture](./assets/architecture.svg)
 
 **Flow:** user uploads/captures a skin image → frontend sends it to the backend → DINOv2 classifies the condition → the prediction is passed to Groq's Llama 3 to generate a plain-language medical explainer → result + PDF report returned to the frontend.
 
